@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package 
+			uri = "http://www.booster2.org/Booster2"
+			class = "org.booster2.booster2.Booster2Package"
+			genModel = "model/generated/Booster2.genmodel" />
+	</extension>
+</plugin>

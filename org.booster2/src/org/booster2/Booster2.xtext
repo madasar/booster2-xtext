@@ -1,0 +1,175 @@
+grammar org.booster2.Booster2 with org.eclipse.xtext.common.Terminals
+
+generate booster2 "http://www.booster2.org/Booster2"
+
+
+System : SystemString name=ID 
+   (imports += Import|sets+=Set|classes+=Class)*('\n')*
+;
+
+SystemString: 'system' ;
+
+TypeDefn :
+ {Set} | {Class} ;
+
+Import: ('import' file=STRING); 
+
+Set : SetStr name=ID '{' ( values+=ID (',' values+=ID)* )*  '}';
+
+Class : 'class' name=ID ('extends' extends+=ID (',' extends+=ID)*)*'{'
+('attributes' (attributes+=Attribute)*|'invariants' (invariants+=Constraint)*|'methods' (methods+=Method)*)*
+('\n')*'}'
+;
+
+
+Attribute : name=ID (isID?='(' 'ID' ')')? ':' type=TypeDecl;
+
+TypeDecl :
+    type=PrimTypeDecl
+ | '[' type=PrimTypeDecl ']'
+ | SetStr '(' type=PrimTypeDecl ')' '[' multiplicity=Multiplicity ']'
+ | SetStr '('  class=[Class|ID] '.' att=ID ')' ;
+ 
+ SetStr: 'set';
+
+PrimTypeDecl :
+    {StringPrimType} 'string'
+ | {IntPrimType} 'int'
+ | {BoolPrimType} 'boolean'
+ | {DecPrimType} 'decimal'
+ | {DatePrimType} 'date'
+ | {DatetimePrimType} 'datetime'
+ | {TimePrimType} 'time'
+ | {PasswordPrimType} 'password'
+ | {AssocType} val=[TypeDefn|ID]
+ | {BiAssocType} class=[Class|ID] '.' att=ID;
+
+Multiplicity :
+  min=INT '..' max=INT
+|         '..' max=INT
+| min=INT '..'  
+| min=INT '..' '*'
+| size=INT
+|      '*' ;
+
+Method : name=ID '{' (constraint+=Constraint ('\n' constraint+=Constraint)*)* '}' ;
+
+TerminalConstraint:
+	TerminalConstraints
+	|
+ '('TerminalConstraints')'
+;
+
+TerminalConstraints:
+   {TrueConstraint} TrueConstraint 
+ | {FalseConstraint} FalseConstraint 
+ | Not
+ | MethodReference
+ | Relation
+ | Exists
+ | Forall
+ | Forall;
+ 
+
+FalseConstraint:
+	'false'
+;
+
+TrueConstraint:
+	'true'
+;
+ 
+ 
+Not:
+ 'not' constraint=TerminalConstraint ;  
+ 
+Constraint:
+    left=TerminalConstraint (op=BinaryConstraintOp right=Constraint)?
+    ;
+
+BinaryConstraintOp : {And} '&' | {Or} 'or' | {Implies} '=>' | {Seq} ';' ;
+
+
+Relation:
+   left=Expression op=RelationOp right=Expression 
+   |
+  '(' left=Expression op=RelationOp right=Expression ')'
+   ;
+
+RelationOp :
+    {Equals} '='  
+ | {NotEquals} '/='  
+ | {In} ':'  
+ | {NotIn} '/:'  
+ | {LessThan} '<'  
+ | {GreaterThan} '>'  
+ | {LessThanEquals} '<='  
+ | {GreaterThanEquals} '>='  
+ | {Subset} '<:'  
+ | {StrictSubset} '<<:'  
+ | {Superset} ':>'  
+ | {StrictSuperset} ':>>' ;
+
+Exists:
+ "exists" var=ID ':' expr=Expression '@' constraint=TerminalConstraint ;
+
+Forall :
+ "forall" var=ID ':' expr=Expression '@' constraint=TerminalConstraint ;
+
+
+TerminalExpression :
+    ValueExpression
+ | {Head} "head" '(' expression=TerminalExpression ')'
+ | {Tail} "tail" '(' expression=TerminalExpression ')'
+ | {Card} "card" '(' expression=TerminalExpression ')' ;
+ 
+Expression:
+    left=TerminalExpression (op=ExpressionOp right=Expression )? ;
+    
+ExpressionOp :
+   {Add} "+"
+ | {Subtract} "-"
+ | {Multiply} "*"
+ | {Divide} "/"
+ | {Union} "\\/"
+ | {Intersection} "/\\"
+ | {Maximum} "max"
+ | {Minimum} "min"
+ | {Concat} "++" ;
+
+MethodReference : Path '(' constraint=Constraint ')' ;
+
+ValueExpression :
+   {IntegerValue} intValue=INT
+ | {DecimalValue} decValue= INT '.' INT
+ | {StringValue}  strValue=STRING
+ | {PathValue} path=Path
+ | {StringExtent} "string"
+ | {IntegerExtent} "int"
+ | {BoolExtent} 'boolean'
+ | {DecExtent} 'decimal'
+ | {DateExtent} 'date'
+ | {DatetimeExtent} 'datetime'
+ | {TimeExtent} 'time'
+ | {PasswordPrimType} 'password'
+ | {NullValue} "null"
+ | {SetExtension} "{" exprs+=Expression ("," exprs+=Expression)*"}" ;
+
+Path:
+ start=PathStart ( '.' components+=PathComponent)* ;
+
+PathStart:
+   {This} "this"
+ | {ThisPrimed} "this" "'"
+ | {IdPath} ident=ID ( decorator=Decorator )? ;
+
+PathComponent:
+   identifier=ID (primed="'")? ;
+
+Decorator:
+   {In} "?"
+ | {Out} "!"
+ | {Primed} "'" ;
+ 
+
+terminal STRING : '"' ('\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\''|'\\') | !(('\\'|'"')))* '"' ;  

@@ -1,0 +1,68 @@
+module org.booster2.GenerateBooster2
+
+import org.eclipse.xtext.xtext.generator.*
+import org.eclipse.xtext.xtext.generator.model.project.*
+
+var rootPath = ".."
+
+Workflow {
+	
+	component = XtextGenerator {
+		configuration = {
+			project = StandardProjectConfig {
+				baseName = "org.booster2"
+				rootPath = rootPath
+				runtimeTest = {
+					enabled = true
+				}
+				eclipsePlugin = {
+					enabled = true
+				}
+				eclipsePluginTest = {
+					enabled = true
+				}
+				web = {
+					enabled = true
+
+				}
+				
+				
+				createEclipseMetaData = true			
+				
+				}
+			code = {
+				encoding = "UTF-8"
+				fileHeader = ""
+			}
+			
+		}
+		language = StandardLanguage {
+			name = "org.booster2.Booster2"
+			fileExtensions = "boo2"
+			
+			parserGenerator = {
+			  options = {
+			    ignoreCase = true
+			    backtrack = true
+			  }
+			}
+
+			serializer = {
+				generateStub = true
+			}
+			webSupport = {
+				generateHtmlExample = true
+				framework = "ACE"
+			}
+			formatter={
+   				 generateStub=true
+			}
+			validator = {
+				// composedCheck = "org.eclipse.xtext.validation.NamesAreUniqueValidator"
+			}
+			
+		}
+		
+	}
+	
+}

@@ -1,0 +1,45 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="en-us">
+	<title>CodeMirror Booster2 Web Editor</title>
+	<link rel="stylesheet" type="text/css" href="webjars/codemirror/5.13.2/lib/codemirror.css"/>
+	<link rel="stylesheet" type="text/css" href="webjars/codemirror/5.13.2/addon/hint/show-hint.css"/>
+	<link rel="stylesheet" type="text/css" href="xtext/2.10.0/xtext-codemirror.css"/>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
+	<script src="webjars/requirejs/2.2.0/require.min.js"></script>
+	<script type="text/javascript">
+		var baseUrl = window.location.pathname;
+		var fileIndex = baseUrl.indexOf("index_codemirror.html");
+		if (fileIndex > 0)
+			baseUrl = baseUrl.slice(0, fileIndex);
+		require.config({
+			baseUrl: baseUrl,
+			paths: {
+				"jquery": "webjars/jquery/2.2.3/jquery.min",
+				"xtext/xtext-codemirror": "xtext/2.10.0/xtext-codemirror"
+			},
+			packages: [{
+				name: "codemirror",
+				location: "webjars/codemirror/5.13.2",
+				main: "lib/codemirror"
+			}]
+		});
+		require(["xtext-resources/generated/mode-boo2", "xtext/xtext-codemirror"], function(mode, xtext) {
+    			xtext.createEditor();
+		});
+	</script>
+</head>
+<body>
+
+<div class="container">
+	<div class="header">
+		<h1>CodeMirror Booster2 Web Editor</h1>
+	</div>
+	<div class="content">
+		<div id="xtext-editor" data-editor-xtext-lang="boo2"></div>
+	</div>
+</div>
+
+</body>
+</html>
