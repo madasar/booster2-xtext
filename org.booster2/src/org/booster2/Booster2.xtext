@@ -52,42 +52,27 @@ Multiplicity :
 | size=INT
 |      '*' ;
 
-Method : name=ID '{' (constraint+=Constraint ('\n' constraint+=Constraint)*)* '}' ;
+Method : name=ID '{' (constraint+=Constraint)* '}' ;
+
+Constraint:
+    left=TerminalConstraint (op=BinaryConstraintOp right=Constraint)?
+    |
+    '('left=TerminalConstraint (op=BinaryConstraintOp right=Constraint)?')'
+    ;
 
 TerminalConstraint:
-	TerminalConstraints
-	|
- '('TerminalConstraints')'
-;
-
-TerminalConstraints:
-   {TrueConstraint} TrueConstraint 
- | {FalseConstraint} FalseConstraint 
+   {TrueConstraint} 'true' 
+ | {FalseConstraint} 'false' 
  | Not
  | MethodReference
  | Relation
  | Exists
- | Forall
  | Forall;
- 
-
-FalseConstraint:
-	'false'
-;
-
-TrueConstraint:
-	'true'
-;
- 
  
 Not:
  'not' constraint=TerminalConstraint ;  
- 
-Constraint:
-    left=TerminalConstraint (op=BinaryConstraintOp right=Constraint)?
-    ;
 
-BinaryConstraintOp : {And} '&' | {Or} 'or' | {Implies} '=>' | {Seq} ';' ;
+BinaryConstraintOp : {And} ('&'|'\n') | {Or} 'or' | {Implies} '=>' | {Seq} ';' ;
 
 
 Relation:
@@ -124,7 +109,8 @@ TerminalExpression :
  | {Card} "card" '(' expression=TerminalExpression ')' ;
  
 Expression:
-    left=TerminalExpression (op=ExpressionOp right=Expression )? ;
+    left=TerminalExpression (op=ExpressionOp right=Expression )? |
+   '(' left=TerminalExpression (op=ExpressionOp right=Expression )? ')' ;
     
 ExpressionOp :
    {Add} "+"
@@ -144,6 +130,8 @@ ValueExpression :
  | {DecimalValue} decValue= INT '.' INT
  | {StringValue}  strValue=STRING
  | {PathValue} path=Path
+ | {TrueValue} 'true'
+ | {FalseValue} 'false'
  | {StringExtent} "string"
  | {IntegerExtent} "int"
  | {BoolExtent} 'boolean'
