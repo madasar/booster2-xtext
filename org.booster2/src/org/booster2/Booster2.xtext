@@ -16,8 +16,12 @@ Import: ('import' file=STRING);
 
 Set : SetStr name=ID '{' ( values+=ID (',' values+=ID)* )*  '}';
 
-Class : 'class' name=ID ('extends' extends+=ID (',' extends+=ID)*)*'{'
-('attributes' (attributes+=Attribute)*|'invariants' (invariants+=Constraint)*|'methods' (methods+=Method)*)*
+Class : 'class' name=ID ('extends' extends+=ID (',' extends+=ID)*)* '{'
+( 
+     'attributes' (attributes+=Attribute)*
+	|'invariants' (invariants+=Constraint)*
+	|'methods' (methods+=Method)*
+)*
 ('\n')*'}'
 ;
 
@@ -56,13 +60,10 @@ Method : name=ID '{' (constraint+=Constraint)* '}' ;
 
 Constraint:
     left=TerminalConstraint (op=BinaryConstraintOp right=Constraint)?
-    |
-    '('left=TerminalConstraint (op=BinaryConstraintOp right=Constraint)?')'
     ;
 
 TerminalConstraint:
-   {TrueConstraint} 'true' 
- | {FalseConstraint} 'false' 
+'(' Constraint ')'
  | Not
  | MethodReference
  | Relation
@@ -77,8 +78,6 @@ BinaryConstraintOp : {And} ('&'|'\n') | {Or} 'or' | {Implies} '=>' | {Seq} ';' ;
 
 Relation:
    left=Expression op=RelationOp right=Expression 
-   |
-  '(' left=Expression op=RelationOp right=Expression ')'
    ;
 
 RelationOp :
@@ -109,8 +108,7 @@ TerminalExpression :
  | {Card} "card" '(' expression=TerminalExpression ')' ;
  
 Expression:
-    left=TerminalExpression (op=ExpressionOp right=Expression )? |
-   '(' left=TerminalExpression (op=ExpressionOp right=Expression )? ')' ;
+    left=TerminalExpression (op=ExpressionOp right=Expression )? ;
     
 ExpressionOp :
    {Add} "+"

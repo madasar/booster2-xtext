@@ -42,7 +42,7 @@ Workflow {
 			
 			parserGenerator = {
 			  options = {
-			    backtrack = true
+			    //backtrack = true
 			    ignoreCase = true
 			  }
 			}
