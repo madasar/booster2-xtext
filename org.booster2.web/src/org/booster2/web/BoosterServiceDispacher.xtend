@@ -51,8 +51,16 @@ class BoosterServiceDispatcher extends XtextServiceDispatcher {
 						}
 						val document = getResourceDocument(resourceId, context)
 						
-						val pb = new ProcessBuilder("/bin/bash", "-c", "/booster2/booster-deploy.sh "+file.getAbsolutePath()+" > /tmp/booster.log")
-						pb.start();
+						println("preparing to run command: /bin/bash -c /booster2/booster-deploy.sh "+file.getAbsolutePath()+" > /tmp/booster.log")
+						
+						val pb = new ProcessBuilder().inheritIO()
+						.command("/bin/bash", "-c", "/booster2/booster-deploy.sh "+file.getAbsolutePath()+" > /tmp/booster.log").start();
+						
+						if (!pb.alive){
+							println("exit code: "+pb.exitValue)
+							
+						}
+						
 						return new DocumentStateResult(document.stateId)
 						
 				} catch (Throwable throwable) {
